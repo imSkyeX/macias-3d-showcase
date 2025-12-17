@@ -1,0 +1,271 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Apple HIG Color System CSS Variables */
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+
+    --radius: 0.5rem;
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background-secondary text-label-primary font-sf-pro antialiased;
+    background: linear-gradient(135deg, #F2F2F7 0%, #FFFFFF 50%, #F2F2F7 100%);
+    background-attachment: fixed;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Apple Typography System */
+  h1 { @apply text-apple-large-title font-normal tracking-tight; }
+  h2 { @apply text-apple-title-1 font-normal tracking-tight; }
+  h3 { @apply text-apple-title-2 font-normal tracking-tight; }
+  h4 { @apply text-apple-title-3 font-normal tracking-tight; }
+  h5 { @apply text-apple-headline font-semibold; }
+  h6 { @apply text-apple-body font-medium; }
+  
+  p { @apply text-apple-body text-label-secondary leading-relaxed; }
+  
+  .text-large-title { @apply text-apple-large-title font-normal tracking-tight; }
+  .text-title-1 { @apply text-apple-title-1 font-normal tracking-tight; }
+  .text-title-2 { @apply text-apple-title-2 font-normal tracking-tight; }
+  .text-title-3 { @apply text-apple-title-3 font-normal tracking-tight; }
+  .text-headline { @apply text-apple-headline font-semibold; }
+  .text-body { @apply text-apple-body; }
+  .text-callout { @apply text-apple-callout; }
+  .text-subhead { @apply text-apple-subhead; }
+  .text-footnote { @apply text-apple-footnote; }
+  .text-caption-1 { @apply text-apple-caption-1; }
+  .text-caption-2 { @apply text-apple-caption-2; }
+}
+
+/* Apple HIG Design System Components */
+@layer components {
+  /* Materials - Frosted Glass Effects */
+  .material-regular {
+    @apply bg-background-primary/70 backdrop-blur-apple border border-white/20 shadow-apple-sm;
+  }
+  
+  .material-thick {
+    @apply bg-background-primary/80 backdrop-blur-apple-lg border border-white/30 shadow-apple-md;
+  }
+  
+  .material-thin {
+    @apply bg-background-primary/60 backdrop-blur-apple-sm border border-white/10 shadow-apple-sm;
+  }
+  
+  .material-ultrathick {
+    @apply bg-background-primary/90 backdrop-blur-apple-xl border border-white/40 shadow-apple-lg;
+  }
+
+  /* Apple Card System */
+  .hig-card {
+    @apply material-regular rounded-apple-xl p-6 transition-all duration-200 ease-out;
+  }
+  
+  .hig-card-interactive {
+    @apply hig-card hover:shadow-apple-lg hover:scale-[1.02] cursor-pointer;
+  }
+  
+  .hig-card-elevated {
+    @apply bg-background-primary shadow-apple-lg rounded-apple-xl border border-separator-non-opaque/10;
+  }
+
+  /* Apple Button System */
+  .hig-button-primary {
+    @apply bg-system-blue text-white rounded-apple-lg px-6 py-3 font-sf-pro font-medium text-apple-body 
+           hover:bg-system-blue/90 active:bg-system-blue/80 transition-all duration-150 ease-out
+           shadow-apple-sm hover:shadow-apple-md active:scale-95;
+  }
+  
+  .hig-button-secondary {
+    @apply material-regular text-system-blue rounded-apple-lg px-6 py-3 font-sf-pro font-medium text-apple-body 
+           hover:bg-system-blue/10 active:bg-system-blue/20 transition-all duration-150 ease-out
+           border border-system-blue/20 hover:border-system-blue/30 active:scale-95;
+  }
+  
+  .hig-button-tertiary {
+    @apply bg-transparent text-system-blue rounded-apple-lg px-6 py-3 font-sf-pro font-medium text-apple-body 
+           hover:bg-system-blue/10 active:bg-system-blue/20 transition-all duration-150 ease-out
+           active:scale-95;
+  }
+
+  /* Apple Navigation & Headers */
+  .hig-navigation {
+    @apply material-thick border-b border-separator-non-opaque/20 sticky top-0 z-50;
+  }
+  
+  .hig-header {
+    @apply text-title-1 font-bold text-label-primary tracking-tight;
+  }
+  
+  .hig-subheader {
+    @apply text-title-3 font-semibold text-label-secondary;
+  }
+
+  /* Apple List & Grid System */
+  .hig-list-item {
+    @apply flex items-center justify-between py-3 px-4 border-b border-separator-non-opaque/30 
+           hover:bg-fill-quaternary/50 transition-colors duration-150 ease-out;
+  }
+  
+  .hig-grid {
+    @apply grid gap-6;
+  }
+  
+  .hig-grid-2 { @apply hig-grid grid-cols-1 md:grid-cols-2; }
+  .hig-grid-3 { @apply hig-grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3; }
+  .hig-grid-4 { @apply hig-grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4; }
+
+  /* Apple Form Elements */
+  .hig-input {
+    @apply bg-background-secondary border border-separator-opaque rounded-apple-lg px-4 py-3 
+           text-apple-body font-sf-pro placeholder:text-label-tertiary
+           focus:border-system-blue focus:ring-2 focus:ring-system-blue/20 focus:outline-none
+           transition-all duration-150 ease-out;
+  }
+
+  /* Apple Spacing System */
+  .hig-section { @apply py-16; }
+  .hig-container { @apply container mx-auto px-6; }
+  .hig-content { @apply max-w-4xl mx-auto; }
+  
+  /* Apple Animation System */
+  .hig-animate-in {
+    @apply animate-fade-in opacity-0;
+    animation-fill-mode: forwards;
+  }
+  
+  .hig-animate-scale {
+    @apply animate-scale-in opacity-0;
+    animation-fill-mode: forwards;
+  }
+}
+
+/* Apple-style Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-system-gray/40 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-system-gray/60;
+}
+
+::-webkit-scrollbar-corner {
+  @apply bg-transparent;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Apple-style focus rings */
+*:focus-visible {
+  @apply outline-none ring-2 ring-system-blue ring-offset-2 ring-offset-background-primary;
+}
+
+/* Apple-style selection */
+::selection {
+  @apply bg-system-blue/20 text-label-primary;
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
