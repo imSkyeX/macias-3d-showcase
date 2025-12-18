@@ -1,127 +1,123 @@
+import { useState, useEffect } from "react";
+import { ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
 
-import { useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import ProjectCard from "./ProjectCard";
-import { Button } from "@/components/ui/button";
+// Si usas react-router-dom, puedes descomentar la siguiente línea y cambiar <a> por <Link>
+// import { Link } from "react-router-dom";
 
 interface Project {
-  id: string;
   title: string;
+  slug: { current: string };
   description: string;
   imageUrl: string;
+  featuredImageUrl?: string;
+  category: string;
 }
 
-const featuredProjects: Project[] = [
-  {
-    id: "engine-block",
-    title: "Motor V8 - Bloque de Cilindros",
-    description: "Diseño completo de bloque de motor V8 con todas las características técnicas y dimensiones precisas.",
-    imageUrl: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=800&h=600&fit=crop"
-  },
-  {
-    id: "transmission-gear",
-    title: "Sistema de Transmisión",
-    description: "Modelado 3D de caja de cambios con engranajes sincronizados y mecanismos de control.",
-    imageUrl: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&h=600&fit=crop"
-  },
-  {
-    id: "suspension-arm",
-    title: "Brazo de Suspensión",
-    description: "Componente de suspensión automotriz con análisis de esfuerzos y optimización de peso.",
-    imageUrl: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&h=600&fit=crop"
-  }
-];
+interface FeaturedCarouselProps {
+  projects: Project[];
+}
 
-const FeaturedCarousel = () => {
+const FeaturedCarousel = ({ projects }: FeaturedCarouselProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
+  // Si no hay proyectos, no renderizamos nada
+  if (!projects || projects.length === 0) return null;
+
   const nextSlide = () => {
-    setCurrentIndex((prev) => (prev + 1) % featuredProjects.length);
+    setCurrentIndex((prev) => (prev === projects.length - 1 ? 0 : prev + 1));
   };
 
   const prevSlide = () => {
-    setCurrentIndex((prev) => (prev - 1 + featuredProjects.length) % featuredProjects.length);
+    setCurrentIndex((prev) => (prev === 0 ? projects.length - 1 : prev - 1));
   };
 
+  // Autoplay solo si hay más de un proyecto
+  useEffect(() => {
+    if (projects.length <= 1) return; 
+
+    const interval = setInterval(() => {
+      nextSlide();
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [currentIndex, projects.length]);
+
+  const currentProject = projects[currentIndex];
+
   return (
-    <section className="hig-section relative">
-      <div className="absolute inset-0 bg-gradient-to-r from-background-primary/60 to-system-blue/5"></div>
-      <div className="hig-container relative z-10">
-        <div className="text-center mb-16">
-          <div className="hig-card p-8 inline-block hig-animate-in">
-            <h2 className="text-large-title font-bold text-label-primary">
-              PROYECTOS DESTACADOS
-            </h2>
-          </div>
-        </div>
-        
-        <div className="relative">
-          <div className="flex items-center justify-center gap-8">
-            <Button
-              onClick={prevSlide}
-              variant="outline"
-              size="icon"
-              className="w-14 h-14 rounded-full hig-button-secondary hover:shadow-apple-lg z-10"
-            >
-              <ChevronLeft className="w-6 h-6" />
-            </Button>
-
-            <div className="flex items-center gap-8 overflow-hidden w-full max-w-7xl">
-              {featuredProjects.map((project, index) => {
-                const offset = index - currentIndex;
-                const isActive = index === currentIndex;
-                
-                return (
-                  <div
-                    key={project.id}
-                    className={`transition-all duration-500 ease-out ${
-                      isActive 
-                        ? 'scale-110 z-20 opacity-100' 
-                        : 'scale-90 opacity-60'
-                    }`}
-                    style={{
-                      transform: `translateX(${offset * 300}px) ${isActive ? 'scale(1.1)' : 'scale(0.9)'}`,
-                      minWidth: '350px'
-                    }}
-                  >
-                    <ProjectCard
-                      id={project.id}
-                      title={project.title}
-                      description={project.description}
-                      imageUrl={project.imageUrl}
-                      className={isActive ? 'shadow-apple-lg' : ''}
-                    />
-                  </div>
-                );
-              })}
+    <div className="w-full h-full relative group overflow-hidden bg-black">
+      
+      {/* 1. IMAGEN DE FONDO (Usando <img> estándar) */}
+      <div className="absolute inset-0 w-full h-full transition-transform duration-700 ease-out">
+        {currentProject.imageUrl ? (
+            <img
+                src={currentProject.featuredImageUrl}
+                alt={currentProject.title}
+                className="w-full h-full object-cover opacity-60"
+            />
+        ) : (
+            <div className="w-full h-full bg-gray-800 flex items-center justify-center text-white/20">
+                Sin Imagen
             </div>
+        )}
+        {/* Gradiente para mejorar legibilidad del texto */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#1e1e1e] via-black/40 to-transparent" />
+      </div>
 
-            <Button
-              onClick={nextSlide}
-              variant="outline"
-              size="icon"
-              className="w-14 h-14 rounded-full hig-button-secondary hover:shadow-apple-lg z-10"
-            >
-              <ChevronRight className="w-6 h-6" />
-            </Button>
-          </div>
+      {/* 2. CONTENIDO (TEXTO) */}
+      <div className="absolute bottom-0 left-0 w-full p-8 md:p-16 z-20 flex flex-col items-start justify-end h-full pointer-events-none">
+        <div className="max-w-3xl pointer-events-auto animate-fadeIn">
+          <span className="inline-block py-1 px-3 rounded-full bg-orange-600/90 text-white text-xs font-bold uppercase tracking-wider mb-4">
+            {currentProject.category}
+          </span>
+          <h2 className="text-4xl md:text-6xl font-bold text-white mb-4 leading-tight">
+            {currentProject.title}
+          </h2>
+          <p className="text-gray-300 text-lg md:text-xl mb-8 line-clamp-2 max-w-2xl">
+            {currentProject.description}
+          </p>
+          
+          {/* Usamos <a> estándar para el enlace. Si usas React Router, cambia esto por <Link to=...> */}
+          <a 
+            href={`/proyectos/${currentProject.slug.current}`}
+            className="inline-flex items-center gap-2 bg-white text-black px-6 py-3 rounded-full font-bold hover:bg-orange-500 hover:text-white transition-colors duration-300"
+          >
+            Ver Proyecto <ArrowRight size={20} />
+          </a>
+        </div>
+      </div>
 
-          <div className="flex justify-center mt-12 gap-3">
-            {featuredProjects.map((_, index) => (
+      {/* 3. FLECHAS DE NAVEGACIÓN (Solo mostrar si hay más de 1 proyecto) */}
+      {projects.length > 1 && (
+        <>
+          <button
+            onClick={prevSlide}
+            className="absolute left-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-black/30 text-white hover:bg-orange-600 backdrop-blur-sm transition-all z-30 opacity-0 group-hover:opacity-100 cursor-pointer"
+          >
+            <ChevronLeft size={32} />
+          </button>
+          
+          <button
+            onClick={nextSlide}
+            className="absolute right-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-black/30 text-white hover:bg-orange-600 backdrop-blur-sm transition-all z-30 opacity-0 group-hover:opacity-100 cursor-pointer"
+          >
+            <ChevronRight size={32} />
+          </button>
+
+          {/* INDICADORES (PUNTITOS) */}
+          <div className="absolute bottom-8 right-8 flex gap-2 z-30">
+            {projects.map((_, idx) => (
               <button
-                key={index}
-                onClick={() => setCurrentIndex(index)}
-                className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                  index === currentIndex 
-                    ? 'bg-system-blue scale-125 shadow-apple-sm' 
-                    : 'bg-system-gray-3 hover:bg-system-blue/60'
+                key={idx}
+                onClick={() => setCurrentIndex(idx)}
+                className={`h-3 rounded-full transition-all cursor-pointer ${
+                  idx === currentIndex ? "bg-orange-500 w-8" : "bg-white/50 w-3 hover:bg-white"
                 }`}
               />
             ))}
           </div>
-        </div>
-      </div>
-    </section>
+        </>
+      )}
+    </div>
   );
 };
 

@@ -1,49 +1,73 @@
-import { useState } from "react"; // <--- 1. Importamos useState
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AnimatePresence } from "framer-motion"; // <--- 2. Importamos AnimatePresence
+import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
+import { AnimatePresence } from "framer-motion";
+import { useState } from "react";
 
+// Componentes
+import Header from "@/components/Header";
+import InitialLoader from "@/components/InitialLoader";
+import Fondo3D from "@/components/Fondo3D"; 
+
+// Páginas
 import Index from "./pages/Index";
-import NotFound from "./pages/NotFound";
+import About from "./pages/About";
+import Projects from "./pages/Projects";
+import Graphics from "./pages/Graphics"; 
 import ProjectDetail from "./components/ProjectDetail";
-import ScrollToTop from "./components/ScrollToTop";
-import InitialLoader from "./components/InitialLoader"; // <--- 3. Importamos tu Loader
-
-const queryClient = new QueryClient();
 
 const App = () => {
-  // 4. Creamos el estado para saber si estamos cargando
-  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(() => {
+    const hasVisited = sessionStorage.getItem("introShown");
+    return !hasVisited;
+  });
+
+  const location = useLocation();
+  const navigate = useNavigate(); 
+
+  const handleLoaderComplete = () => {
+    setLoading(false);
+    sessionStorage.setItem("introShown", "true");
+  };
+
+  const handleManualReset = () => {
+    navigate("/"); 
+    setLoading(true);
+  };
+
+  // --- LÓGICA DE RENDIMIENTO ---
+  // Si la ruta actual empieza por "/proyectos", NO mostramos el 3D.
+  // Esto cubre tanto "/proyectos" (lista) como "/proyectos/mi-proyecto" (detalle).
+  const show3DBackground = !location.pathname.startsWith('/proyectos');
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
+    <>
+      {/* Renderizado Condicional: 
+         El componente <Fondo3D /> se desmonta completamente en la sección proyectos.
+      */}
+      {show3DBackground && <Fondo3D />}
 
-        {/* 5. BLOQUE DE ANIMACIÓN DE CARGA */}
-        {/* AnimatePresence permite que el componente se anime al desaparecer (exit) */}
-        <AnimatePresence mode="wait">
-          {isLoading && (
-            <InitialLoader onComplete={() => setIsLoading(false)} />
-          )}
-        </AnimatePresence>
+      <AnimatePresence>
+        {loading && <InitialLoader onComplete={handleLoaderComplete} />}
+      </AnimatePresence>
 
-        {/* Tu aplicación carga debajo (oculta por el loader al principio) */}
-        <BrowserRouter>
-          <ScrollToTop />
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/project/:id" element={<ProjectDetail />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-    </QueryClientProvider>
+      {/* Contenido de la App */}
+      {/* Nota: En la página de proyectos, como no hay Fondo3D detrás, 
+          asegúrate de que Projects.tsx tenga un color de fondo (bg-slate-900 o similar)
+          para que no se vea blanco transparente.
+      */}
+      <div className="relative z-10 w-full min-h-screen"> 
+        
+        <Header onRestartAnimation={handleManualReset} />
+        
+        <Routes location={location} key={location.pathname}>
+          <Route path="/" element={<Index preloaderActive={loading} />} />
+          <Route path="/sobre-mi" element={<About />} />
+          <Route path="/proyectos" element={<Projects />} />
+          <Route path="/proyectos/:slug" element={<ProjectDetail />} /> 
+          <Route path="/graficos" element={<Graphics />} />
+        </Routes>
+        
+      </div>
+    </>
   );
 };
 

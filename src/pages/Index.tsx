@@ -1,123 +1,103 @@
-import { useEffect, useState } from "react";
-import { client } from "../lib/sanity";
-import UcaPracticesGrid from "@/components/UcaPracticesGrid";
-// 1. IMPORTAMOS TU COMPONENTE
-import ProjectCard from "@/components/ProjectCard"; 
+import { Link } from "react-router-dom";
+import { motion, Variants } from "framer-motion";
 
-// Interfaz de datos
-interface ProjectData {
-  title: string;
-  slug: { current: string };
-  description: string;
-  imageUrl: string;
+// === 1. DEFINICIÓN DE INTERFAZ ===
+// Definimos que este componente acepta una propiedad llamada 'preloaderActive'
+interface IndexProps {
+  preloaderActive?: boolean;
 }
 
-const Index = () => {
-  const [projects, setProjects] = useState<ProjectData[]>([]);
-  const [loading, setLoading] = useState(true);
+// === 2. CONFIGURACIÓN DE ANIMACIONES ===
+const containerVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.2,
+      delayChildren: 0.5, // Pequeña espera para que el loader desaparezca suavemente
+    },
+  },
+};
 
-  useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        // Pedimos los datos a Sanity (incluida la URL de la imagen)
-        const query = `*[_type == "project"]{
-          title,
-          slug,
-          description,
-          "imageUrl": mainImage.asset->url
-        }`;
-        const data = await client.fetch(query);
-        setProjects(data);
-      } catch (error) {
-        console.error("Error fetching projects:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProjects();
-  }, []);
+const itemVariants: Variants = {
+  hidden: { 
+    y: 30,
+    opacity: 0,
+    filter: "blur(10px)",
+  },
+  visible: {
+    y: 0,
+    opacity: 1,
+    filter: "blur(0px)",
+    transition: { duration: 0.8, ease: "easeOut" },
+  },
+};
 
+// === 3. COMPONENTE PRINCIPAL ===
+// Recibimos la prop 'preloaderActive' (por defecto false si no se pasa)
+const Index = ({ preloaderActive = false }: IndexProps) => {
+  
   return (
-    <div className="min-h-screen bg-background-secondary">
-      {/* HEADER */}
-      <header className="hig-navigation">
-        <div className="hig-container">
-          <div className="flex justify-between items-center py-6">
-            <div className="hig-animate-in">
-              <h1 className="text-large-title font-bold text-label-primary tracking-tight">
-                JM MACIAS
-              </h1>
-              <p className="text-headline text-system-blue font-semibold mt-1">3D Designer & CATIA Specialist</p>
-            </div>
-            <div className="text-right hig-animate-in" style={{ animationDelay: '0.2s' }}>
-              <div className="text-title-2 font-bold text-label-primary">DS CATIA</div>
-              <p className="text-footnote text-label-secondary font-medium">Professional 3D Modeling</p>
-            </div>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen flex items-center justify-center p-4 relative z-10">
+      
+      <motion.div 
+        variants={containerVariants}
+        // LA CLAVE ESTÁ AQUÍ:
+        // Si el preloader está activo -> estado "hidden"
+        // Si el preloader termina (false) -> pasa a "visible"
+        initial="hidden"
+        animate={preloaderActive ? "hidden" : "visible"}
+        
+        className="
+          max-w-5xl mx-auto text-center 
+          bg-white/5 backdrop-blur-xl border border-white/50 
+          rounded-[3rem] p-8 md:p-16 
+          shadow-[inset_0_0_50px_rgba(255,255,255,0.40)]
+        "
+      >
+        
+        <motion.h1 
+          variants={itemVariants} 
+          className="text-5xl md:text-8xl font-bold text-white mb-6 tracking-tight drop-shadow-lg"
+        >
+          JM MACIAS
+        </motion.h1>
 
-      {/* HERO SECTION */}
-      <section className="hig-section relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-background-primary/80 to-system-blue/5"></div>
-        <div className="hig-container text-center relative z-10">
-          <div className="hig-card-elevated p-16 max-w-5xl mx-auto hig-animate-scale">
-            <h2 className="text-large-title font-bold text-label-primary mb-8 tracking-tight">
-              Diseño 3D Profesional
-            </h2>
-            <p className="text-title-3 text-label-secondary max-w-4xl mx-auto leading-relaxed font-normal">
-              Especialista en modelado 3D con CATIA V5, creando soluciones innovadoras para la industria automotriz 
-              y mecánica. Cada proyecto combina precisión técnica con creatividad en el diseño.
-            </p>
-          </div>
-        </div>
-      </section>
+        <motion.h2 
+          variants={itemVariants}
+          className="text-2xl md:text-4xl font-light text-gray-100 mb-8 leading-tight"
+        >
+          Diseño 3D Profesional & <span className="text-[#ff9500] font-semibold">CATIA V5</span> Specialist
+        </motion.h2>
 
-      {/* --- SECCIÓN DE PROYECTOS (AQUÍ USAMOS TU PROJECTCARD) --- */}
-      <section className="hig-section py-12">
-        <div className="hig-container">
-          <h3 className="text-title-2 font-bold text-label-primary mb-8 hig-animate-in">Proyectos Destacados</h3>
-          
-          {loading ? (
-            <div className="text-center py-20 text-label-secondary">Cargando proyectos...</div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {projects.map((project, index) => (
-                // 2. USAMOS TU COMPONENTE AQUÍ
-                <ProjectCard 
-                  key={project.slug.current}
-                  id={project.slug.current}          // Pasamos el slug como ID
-                  title={project.title}
-                  description={project.description}
-                  imageUrl={project.imageUrl}        // Pasamos la URL de Sanity
-                  className="hig-animate-in"         // Mantenemos la animación
-                  // style={{ animationDelay: `${index * 0.1}s` }} // (Opcional si ProjectCard acepta style)
-                />
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
+        <motion.p 
+          variants={itemVariants}
+          className="text-lg md:text-xl text-gray-200 max-w-3xl mx-auto leading-relaxed font-normal mb-12 drop-shadow-md"
+        >
+          Creando soluciones innovadoras para la industria automotriz y mecánica. 
+          Precisión técnica y creatividad en cada modelado.
+        </motion.p>
 
-      {/* UCA Practices Grid */}
-      <UcaPracticesGrid />
+        <motion.div 
+          variants={itemVariants}
+          className="flex flex-col md:flex-row gap-4 justify-center items-center"
+        >
+          <Link 
+            to="/proyectos" 
+            className="px-8 py-4 bg-[#ff9500] text-white font-bold rounded-full hover:bg-[#ff9500]/90 transition-all transform hover:scale-105 shadow-lg hover:shadow-orange-500/20"
+          >
+            Ver Proyectos
+          </Link>
 
-      {/* Footer */}
-      <footer className="material-thick text-label-primary hig-section mt-20">
-        <div className="hig-container text-center">
-          <div className="hig-card-elevated p-12 max-w-3xl mx-auto">
-            <h3 className="text-title-2 font-bold mb-6 text-label-primary">JM MACIAS</h3>
-            <p className="text-headline text-system-blue mb-8 font-semibold">
-              3D Designer especializado en CATIA V5 | Diseño Mecánico e Industrial
-            </p>
-            <div className="border-t border-separator-non-opaque/30 pt-8">
-              <p className="text-footnote text-label-secondary">
-                © 2024 JM MACIAS. Todos los derechos reservados.
-              </p>
-            </div>
-          </div>
-        </div>
-      </footer>
+          <Link 
+            to="/contacto" 
+            className="px-8 py-4 bg-white/10 backdrop-blur-md border border-white/30 text-white font-bold rounded-full hover:bg-white/20 transition-all hover:scale-105 shadow-[inset_0_0_10px_rgba(255,255,255,0.1)]"
+          >
+            Contactar
+          </Link>
+        </motion.div>
+
+      </motion.div>
     </div>
   );
 };
