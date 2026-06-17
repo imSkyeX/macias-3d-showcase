@@ -3,8 +3,8 @@ import { useParams, Link } from "react-router-dom";
 import { client } from "@/lib/sanity";
 import { ChevronLeft, ChevronRight, ArrowLeft } from "lucide-react";
 import { motion } from "framer-motion";
-// Importamos la librería mágica
 import { TransformWrapper, TransformComponent, ReactZoomPanPinchRef } from "react-zoom-pan-pinch";
+import { useSwipeable } from "react-swipeable"; 
 
 interface GalleryItem {
   _key: string;
@@ -24,8 +24,16 @@ const GraphicDetail = () => {
   const [album, setAlbum] = useState<AlbumData | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   
-  // Referencia para controlar el zoom desde fuera (resetearlo al cambiar foto)
   const transformComponentRef = useRef<ReactZoomPanPinchRef | null>(null);
+
+  // Configuración del Swipe con más tolerancia para que sea más fácil de detectar
+  const swipeHandlers = useSwipeable({
+    onSwipedLeft: () => nextItem(),
+    onSwipedRight: () => prevItem(),
+    preventScrollOnSwipe: true,
+    trackMouse: false,
+    delta: 50 // Necesita arrastrar 50px para disparar el evento, así evitamos falsos positivos
+  });
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -46,7 +54,6 @@ const GraphicDetail = () => {
     fetchAlbum();
   }, [slug]);
 
-  // Resetear el zoom cada vez que cambiamos de imagen
   useEffect(() => {
     if (transformComponentRef.current) {
       transformComponentRef.current.resetTransform();
@@ -69,10 +76,13 @@ const GraphicDetail = () => {
   const isVideo = item?._type === 'file' || (item?.url && item.url.match(/\.(mp4|webm|mov|m4v)$/i));
 
   return (
-    <div className="h-screen w-full bg-[#050505] flex flex-col relative overflow-hidden">
+    <div 
+      className="h-screen w-full bg-[#050505] flex flex-col relative overflow-hidden touch-pan-y" 
+      {...swipeHandlers}
+      style={{ touchAction: 'pan-y' }} // Fuerza al navegador a no bloquear los gestos horizontales
+    >
         
-        {/* HEADER FLOTANTE (Fijo arriba) */}
-        {/* pointer-events-none para que el header no bloquee el zoom si pasas el ratón por encima, pero pointer-events-auto en los botones */}
+        {/* HEADER FLOTANTE */}
         <div className="absolute top-0 left-0 right-0 p-6 z-50 flex justify-between items-start pointer-events-none">
             <Link to="/graficos" className="flex items-center gap-2 p-4 bg-orange-400 rounded-2xl text-white hover:text-white transition-colors group pointer-events-auto">
                 <ArrowLeft size={24} className="group-hover:-translate-x-1 transition-transform"/>
@@ -91,57 +101,50 @@ const GraphicDetail = () => {
                     ref={transformComponentRef}
                     initialScale={1}
                     minScale={1}
-                    // AQUÍ ESTÁ LA MAGIA: 50 significa un zoom del 5000%. 
-                    // Prácticamente "sin límite" para el ojo humano.
                     maxScale={50} 
                     centerOnInit={true}
-                    wheel={{ step: 2 }} // Lo subimos a 0.2 para que el zoom con rueda sea más rápido
+                    wheel={{ step: 2 }}
                     pinch={{ disabled: false }}
                     doubleClick={{ disabled: true }}
-                    panning={{ velocityDisabled: false }}
+                    panning={{ velocityDisabled: false, disabled: false }}
                 >
-                    {({ zoomIn, zoomOut }) => ( // Quitamos resetTransform de aquí
+                    {() => (
                         <>
-                            {/* COMPONENTE TRANSFORMABLE */}
                             <TransformComponent
                                 wrapperClass="!w-full !h-full"
                                 contentClass="!w-full !h-full flex items-center justify-center"
                             >
                                 {isVideo ? (
                                      <video 
-                                        src={item.url}
-                                        className="max-w-full max-h-[85vh] shadow-2xl"
-                                        controls autoPlay loop playsInline
+                                       src={item.url}
+                                       className="max-w-full max-h-[85vh] shadow-2xl"
+                                       controls autoPlay loop playsInline
                                      />
                                 ) : (
                                      <img 
-                                          src={item.url}
-                                          alt={item.caption || album.title}
-                                          className="max-w-full max-h-[85vh] w-auto h-auto object-contain shadow-2xl cursor-grab active:cursor-grabbing"
+                                         src={item.url}
+                                         alt={item.caption || album.title}
+                                         className="max-w-full max-h-[85vh] w-auto h-auto object-contain shadow-2xl cursor-grab active:cursor-grabbing"
                                      />
                                 )}
                             </TransformComponent>
 
-                            {/* CONTROLES DE NAVEGACIÓN (FLECHAS) */}
+                            {/* CONTROLES DE NAVEGACIÓN */}
                             {album.gallery.length > 1 && (
                                 <>
                                     <button 
                                         onClick={(e) => { e.stopPropagation(); prevItem(); }} 
-                                        className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 p-4 text-white/20 hover:text-white transition-colors z-40 hidden md:block"
+                                        className="absolute left-2 md:left-8 top-1/2 -translate-y-1/2 p-2 bg-black/30 backdrop-blur-sm rounded-full text-white/70 hover:text-white transition-all z-40"
                                     >
-                                        <ChevronLeft size={48} strokeWidth={1}/>
+                                        <ChevronLeft size={32}/>
                                     </button>
                                     
                                     <button 
                                         onClick={(e) => { e.stopPropagation(); nextItem(); }} 
-                                        className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 p-4 text-white/20 hover:text-white transition-colors z-40 hidden md:block"
+                                        className="absolute right-2 md:right-8 top-1/2 -translate-y-1/2 p-2 bg-black/30 backdrop-blur-sm rounded-full text-white/70 hover:text-white transition-all z-40"
                                     >
-                                        <ChevronRight size={48} strokeWidth={1}/>
+                                        <ChevronRight size={32}/>
                                     </button>
-
-                                    {/* Zonas táctiles invisibles para móvil */}
-                                    <div className="md:hidden absolute inset-y-0 left-0 w-[15%] z-30" onClick={(e) => { e.stopPropagation(); prevItem(); }} />
-                                    <div className="md:hidden absolute inset-y-0 right-0 w-[15%] z-30" onClick={(e) => { e.stopPropagation(); nextItem(); }} />
                                 </>
                             )}
                             
@@ -153,15 +156,14 @@ const GraphicDetail = () => {
                                     key={currentImageIndex}
                                     className="border-l-2 border-orange-500 pl-4 bg-black/20 backdrop-blur-sm p-2 rounded-r-md"
                                 >
-                                    <h2 className="text-white text-2xl font-bold md:hidden drop-shadow-md">{album.title}</h2>
+                                    <h2 className="text-white text-xl font-bold md:hidden drop-shadow-md">{album.title}</h2>
                                     {item.caption && (
-                                        <p className="text-white/90 text-sm italic font-serif mt-1 max-w-md drop-shadow-md">
+                                        <p className="text-white/90 text-sm italic font-serif mt-1 max-w-xs md:max-w-md drop-shadow-md">
                                             "{item.caption}"
                                         </p>
                                     )}
                                 </motion.div>
                             </div>
-
                         </>
                     )}
                 </TransformWrapper>
