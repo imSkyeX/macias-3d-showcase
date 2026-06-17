@@ -1,34 +1,28 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ImageOff, Box, Layers, PenTool } from "lucide-react"; // Importamos iconos extra
+import { ImageOff, Box, Layers } from "lucide-react"; 
 
-// 1. Configuración de estilos por categoría
+// 1. Configuración de estilos por Software
 const CATEGORY_STYLES: Record<string, { color: string; badge: string; button: string; icon: any }> = {
-  "Part Design": {
+  "CATIA V5": {
     color: "text-blue-500",
     badge: "bg-blue-600/90 text-white shadow-blue-500/20",
-    button: "bg-blue-600 hover:bg-blue-700 text-white", // Botón azul
-    icon: Box
-  },
-  "Generative Shape Design": {
-    color: "text-purple-500",
-    badge: "bg-purple-600/90 text-white shadow-purple-500/20",
-    button: "bg-purple-600 hover:bg-purple-700 text-white", // Botón violeta
-    icon: PenTool
-  },
-  "Module Assembly": {
-    color: "text-amber-500",
-    badge: "bg-amber-600/90 text-white shadow-amber-500/20",
-    button: "bg-amber-600 hover:bg-amber-700 text-white", // Botón naranja
+    button: "bg-blue-600 hover:bg-blue-700 text-white border-blue-500/50", 
     icon: Layers
+  },
+  "SolidWorks": {
+    color: "text-red-500",
+    badge: "bg-red-600/90 text-white shadow-red-500/20",
+    button: "bg-red-600 hover:bg-red-700 text-white border-red-500/50", 
+    icon: Box
   }
 };
 
-// Estilo por defecto (por si falta la categoría)
+// Estilo por defecto
 const DEFAULT_STYLE = {
   color: "text-slate-500",
   badge: "bg-slate-700 text-slate-200",
-  button: "bg-slate-800 hover:bg-slate-900 text-white",
+  button: "bg-slate-800 hover:bg-slate-900 text-white border-slate-700",
   icon: Box
 };
 
@@ -37,13 +31,12 @@ interface ProjectCardProps {
   title: string;
   description: string;
   imageUrl: string;
-  category?: string; // <--- 2. AÑADIMOS ESTA PROP NUEVA
+  category?: string; 
   className?: string;
 }
 
 const ProjectCard = ({ id, title, description, imageUrl, category, className }: ProjectCardProps) => {
   
-  // 3. Seleccionamos el estilo basado en la prop 'category'
   const theme = category ? CATEGORY_STYLES[category] || DEFAULT_STYLE : DEFAULT_STYLE;
   const Icon = theme.icon;
 
@@ -53,11 +46,11 @@ const ProjectCard = ({ id, title, description, imageUrl, category, className }: 
       {/* Contenedor de la Imagen */}
       <div className="aspect-video w-full bg-gradient-to-br from-gray-800 to-gray-900 overflow-hidden rounded-t-xl relative">
         
-        {/* --- NUEVO: BADGE DE CATEGORÍA --- */}
+        {/* BADGE DE SOFTWARE */}
         {category && (
           <div className={`absolute top-3 right-3 z-10 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 backdrop-blur-sm shadow-lg ${theme.badge}`}>
             <Icon size={12} />
-            {category === "Generative Shape Design" ? "GSD" : category} {/* Acortamos GSD si es muy largo */}
+            {category}
           </div>
         )}
 
@@ -87,11 +80,10 @@ const ProjectCard = ({ id, title, description, imageUrl, category, className }: 
         </p>
         
         <Link to={`/proyectos/${id}`} className="mt-auto">
-          {/* 4. APLICAMOS EL COLOR AL BOTÓN */}
           <Button 
             className={`w-full font-semibold transition-all duration-300 border rounded-xl ${theme.button}`}
           >
-            VER EN 3D
+            View 3D
           </Button>
         </Link>
       </div>

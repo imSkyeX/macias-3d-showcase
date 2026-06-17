@@ -81,7 +81,7 @@ const FeaturedCarousel = ({ projects }: FeaturedCarouselProps) => {
             href={`/proyectos/${currentProject.slug.current}`}
             className="inline-flex items-center gap-2 bg-white text-black px-6 py-3 rounded-full font-bold hover:bg-orange-500 hover:text-white transition-colors duration-300"
           >
-            Ver Proyecto <ArrowRight size={20} />
+            View Project <ArrowRight size={20} />
           </a>
         </div>
       </div>

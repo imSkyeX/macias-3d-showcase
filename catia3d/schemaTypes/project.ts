@@ -30,7 +30,7 @@ export default defineType({
       rows: 3,
     }),
 
-    // --- NUEVO: DESTACADO PARA CARRUSEL ---
+    // --- DESTACADO PARA CARRUSEL ---
     defineField({
       name: 'isFeatured',
       title: '¿Destacar en Carrusel?',
@@ -45,21 +45,20 @@ export default defineType({
       type: 'image',
       description: 'Imagen panorámica para el carrusel (1920x1080 recomendado).',
       options: { hotspot: true },
-      hidden: ({ document }) => !document?.isFeatured, // Solo se ve si activas el switch anterior
+      hidden: ({ document }) => !document?.isFeatured, 
     }),
     // ---------------------------------------
 
     // 4. CATEGORÍA (Para los filtros)
-    defineField({
+   defineField({
       name: 'category',
-      title: 'Categoría CATIA',
+      title: 'Software 3D',
       type: 'string',
-      description: 'Selecciona el módulo principal para organizar la web',
+      description: 'Selecciona el software principal utilizado',
       options: {
         list: [
-          { title: 'Part Design (Mecánica)', value: 'Part Design' },
-          { title: 'Generative Shape Design (Superficies)', value: 'Generative Shape Design' },
-          { title: 'Module Assembly (Ensamblajes)', value: 'Module Assembly' },
+          { title: 'CATIA V5', value: 'CATIA V5' },
+          { title: 'SolidWorks', value: 'SolidWorks' },
         ],
         layout: 'radio'
       },
@@ -90,13 +89,33 @@ export default defineType({
       type: 'text',
     }),
 
-    // 8. ARCHIVO 3D (.glb)
+    // 8. ARCHIVO 3D (.glb) - ENSAMBLADO NORMAL
     defineField({
       name: 'model3d',
-      title: 'Archivo 3D (.glb)',
+      title: 'Archivo 3D Ensamblado (.glb)',
       type: 'file',
       options: { accept: '.glb,.gltf' },
+      description: 'Sube aquí el modelo completo (cerrado/ensamblado).',
     }),
+
+    // --- NUEVO: LÓGICA DE EXPLOSIONADO ---
+    defineField({
+      name: 'hasExplodedView',
+      title: '¿Tiene vista explosionada?',
+      type: 'boolean',
+      initialValue: false,
+      description: 'Activa esto si has exportado una versión explosionada de este ensamblaje.',
+    }),
+
+    defineField({
+      name: 'explodedModel3d',
+      title: 'Archivo 3D Explosionado (.glb)',
+      type: 'file',
+      options: { accept: '.glb,.gltf' },
+      description: 'Sube aquí el modelo con las piezas separadas.',
+      hidden: ({ document }) => !document?.hasExplodedView, // Magia: se oculta si es false
+    }),
+    // ------------------------------------
 
     // 9. IMAGEN PRINCIPAL (Para la Card pequeña)
     defineField({

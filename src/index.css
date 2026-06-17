@@ -1,6 +1,64 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 
+/* --- ESTILOS PARA EL GRID MASONRY --- */
+
+/* El contenedor principal: activa el modo flexible */
+.my-masonry-grid {
+  display: flex;
+  margin-left: -24px; /* Compensación del hueco a la izquierda */
+  width: auto;
+}
+
+/* Las columnas individuales */
+.my-masonry-grid_column {
+  padding-left: 24px; /* Hueco entre columnas (Gutter) */
+  background-clip: padding-box;
+}
+
+/* Ocultar barra de scroll pero permitir desplazamiento (Clase específica) */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* Cursores personalizados para la experiencia de zoom */
+.cursor-zoom-in {
+  cursor: zoom-in;
+}
+.cursor-zoom-out {
+  cursor: zoom-out;
+}
+
+/* Animación suave para el fondo del modal */
+.backdrop-blur-md {
+  backdrop-filter: blur(12px);
+}
+
+html, body {
+  /* Esto evita el efecto de rebote (overscroll) en toda la página */
+  overscroll-behavior-y: none; 
+  /* Asegura que el fondo del navegador sea del mismo color que tu web */
+  background-color: #1e1e1e; 
+}
+
+/* --- ANIQUILACIÓN GLOBAL DEL SCROLLBAR --- */
+@layer base {
+  /* Ocultar en Chrome, Safari y Opera en toda la web */
+  *::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+
+  /* Ocultar en IE, Edge y Firefox, pero permitiendo el scroll */
+  * {
+    -ms-overflow-style: none !important;  /* IE and Edge */
+    scrollbar-width: none !important;  /* Firefox */
+  }
+}

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { client } from "../lib/sanity";
 import ProjectCard from "@/components/ProjectCard";
 import FeaturedCarousel from "@/components/FeaturedCarousel";
-import { Box, Layers, PenTool, LayoutGrid } from "lucide-react";
+import { Box, Layers, LayoutGrid } from "lucide-react"; // Eliminamos PenTool que ya no se usa
 import { motion } from "framer-motion";
 import Lottie from "lottie-react";
 import animationData from "../assets/intro-logo.json"; 
@@ -17,11 +17,11 @@ interface ProjectData {
   isFeatured: boolean;
 }
 
+// --- ACTUALIZACIÓN: NUEVAS PESTAÑAS DE SOFTWARE ---
 const TABS = [
-  { id: "All", label: "Todos", icon: LayoutGrid },
-  { id: "Part Design", label: "Part Design", icon: Box },
-  { id: "Generative Shape Design", label: "GSD (Shapes)", icon: PenTool },
-  { id: "Module Assembly", label: "Assembly", icon: Layers },
+  { id: "All", label: "All", icon: LayoutGrid },
+  { id: "CATIA V5", label: "CATIA V5", icon: Layers },
+  { id: "SolidWorks", label: "SolidWorks", icon: Box },
 ];
 
 const Projects = () => {
@@ -31,7 +31,6 @@ const Projects = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      // 1. Iniciamos la carga de datos
       const projectsPromise = client.fetch(
         `*[_type == "project"] | order(_createdAt desc) {
           title, 
@@ -44,12 +43,9 @@ const Projects = () => {
         }`
       );
 
-      // 2. Creamos una promesa artificial de 1 segundo (o 1000ms)
-      // Esto asegura que el loader se vea AL MENOS este tiempo.
       const delayPromise = new Promise((resolve) => setTimeout(resolve, 900)); 
 
       try {
-        // 3. Esperamos a que AMBAS cosas terminen (la carga y el tiempo mínimo)
         const [data] = await Promise.all([projectsPromise, delayPromise]);
         setProjects(data);
       } catch (error) {
@@ -69,21 +65,19 @@ const Projects = () => {
     ? projects
     : projects.filter((p) => p.category === activeTab);
 
-  // --- AQUI ESTA EL CAMBIO DEL LOADER ---
   if (loading) {
     return (
       <div className="min-h-screen bg-[#1e1e1e] flex items-center justify-center z-50 fixed inset-0">
-        <div className="w-64 h-64 md:w-96 md:h-96"> {/* Controla el tamaño del logo aquí */}
+        <div className="w-64 h-64 md:w-96 md:h-96"> 
            <Lottie 
              animationData={animationData} 
-             loop={true} // Lo ponemos en bucle por si la carga tarda más de la cuenta
+             loop={true} 
              autoplay={true}
            />
         </div>
       </div>
     );
   }
-  // --------------------------------------
 
   return (
     <div className="min-h-screen bg-[#1e1e1e] md:pt-[5.5rem] pb-20"> 
@@ -100,9 +94,10 @@ const Projects = () => {
         
         <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-12">
           <div>
-            <h2 className="text-3xl font-bold text-white mb-2">Galería Técnica</h2>
+            <h2 className="text-3xl font-bold text-white mb-2">Technical Gallery</h2>
+            {/* Texto actualizado */}
             <p className="text-white/40">
-              Selecciona una disciplina para filtrar los proyectos.
+              Select the design software to filter the projects.
             </p>
           </div>
 

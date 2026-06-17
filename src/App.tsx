@@ -12,7 +12,9 @@ import Index from "./pages/Index";
 import About from "./pages/About";
 import Projects from "./pages/Projects";
 import Graphics from "./pages/Graphics"; 
+import Contact from "./pages/Contact"; // <-- NUEVO: Importamos la página de contacto
 import ProjectDetail from "./components/ProjectDetail";
+import GraphicDetail from "./components/GraphicDetail";
 
 const App = () => {
   const [loading, setLoading] = useState(() => {
@@ -27,46 +29,60 @@ const App = () => {
     setLoading(false);
     sessionStorage.setItem("introShown", "true");
   };
+  
+  // Lógica existente para gráficos
+  const isGraphicDetail = location.pathname.startsWith("/graficos/") && location.pathname !== "/graficos";
+
+  // --- NUEVA LÓGICA AÑADIDA ---
+  // Detectamos si estamos en el detalle de un proyecto (ej: /proyectos/mi-app)
+  const isProjectDetail = location.pathname.startsWith("/proyectos/") && location.pathname !== "/proyectos";
 
   const handleManualReset = () => {
     navigate("/"); 
     setLoading(true);
   };
 
-  // --- LÓGICA DE RENDIMIENTO ---
-  // Si la ruta actual empieza por "/proyectos", NO mostramos el 3D.
-  // Esto cubre tanto "/proyectos" (lista) como "/proyectos/mi-proyecto" (detalle).
   const show3DBackground = !location.pathname.startsWith('/proyectos');
 
   return (
     <>
-      {/* Renderizado Condicional: 
-         El componente <Fondo3D /> se desmonta completamente en la sección proyectos.
-      */}
       {show3DBackground && <Fondo3D />}
 
       <AnimatePresence>
         {loading && <InitialLoader onComplete={handleLoaderComplete} />}
       </AnimatePresence>
 
-      {/* Contenido de la App */}
-      {/* Nota: En la página de proyectos, como no hay Fondo3D detrás, 
-          asegúrate de que Projects.tsx tenga un color de fondo (bg-slate-900 o similar)
-          para que no se vea blanco transparente.
-      */}
-      <div className="relative z-10 w-full min-h-screen"> 
+      <div className="app-container">
+      
+      {/* 4. HEADER CON LOGICA DE VISIBILIDAD MÓVIL */}
+      
+      {!isGraphicDetail && (
+         /* Explicación de clases Tailwind:
+            - Si isProjectDetail es true:
+                 "hidden": Oculta el div en móviles (por defecto).
+                 "md:block": Muestra el div en pantallas medianas (tablets/desktop) en adelante.
+            - Si es false (resto de la web): 
+                 "": No aplica ninguna clase extra (se ve siempre).
+         */
+         <div className={isProjectDetail ? "hidden md:block" : ""}>
+             <Header onRestartAnimation={handleManualReset} />
+         </div>
+      )}
+
+      <Routes location={location} key={location.pathname}>
+        <Route path="/" element={<Index preloaderActive={loading} />} />
+        <Route path="/sobre-mi" element={<About />} />
+        <Route path="/proyectos" element={<Projects />} />
+        <Route path="/proyectos/:slug" element={<ProjectDetail />} />
         
-        <Header onRestartAnimation={handleManualReset} />
-        
-        <Routes location={location} key={location.pathname}>
-          <Route path="/" element={<Index preloaderActive={loading} />} />
-          <Route path="/sobre-mi" element={<About />} />
-          <Route path="/proyectos" element={<Projects />} />
-          <Route path="/proyectos/:slug" element={<ProjectDetail />} /> 
-          <Route path="/graficos" element={<Graphics />} />
-        </Routes>
-        
-      </div>
+        <Route path="/graficos" element={<Graphics />} />
+        <Route path="/graficos/:slug" element={<GraphicDetail />} />
+
+        {/* --- NUEVA RUTA DE CONTACTO --- */}
+        <Route path="/contacto" element={<Contact />} />
+      </Routes>
+      
+    </div>
     </>
   );
 };
